@@ -1,9 +1,13 @@
 package com.aditya.rest.webservices.user;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class UserResource {
@@ -20,8 +24,13 @@ public class UserResource {
     }
 
     @GetMapping("/users/{id}")
-    public User getUser(@PathVariable Integer id){
-        return userDaoService.getUser(id);
+    public EntityModel<User> getUser(@PathVariable Integer id){
+        User user = userDaoService.getUser(id);
+
+        EntityModel<User> entityModel = EntityModel.of(user);
+        WebMvcLinkBuilder webMvcLinkBuilder = WebMvcLinkBuilder.linkTo(methodOn(this.getClass()).getAllUsers());
+        entityModel.add(webMvcLinkBuilder.withRel("all-users"));
+        return entityModel;
     }
 
     //Post Users
